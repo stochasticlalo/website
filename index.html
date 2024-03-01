@@ -112,7 +112,7 @@
     <p>Developed by Eduardo Araujo &#169; 2024</p>
   </div>
   <script>
-consoleText(['Hello World!', 'Eduardo Araujo', 'Back End Developer', 'Node.js', 'TypeScript'], 'text',['#ABB2B9']);
+consoleText(['Hello World!', 'Eduardo Araujo', 'Back End Developer', 'Node.js', 'TypeScript'], 'text',['#ffffff']);
 
 function consoleText(words, id, colors) {
   if (colors === undefined) colors = ['#fff'];
@@ -134,7 +134,7 @@ function consoleText(words, id, colors) {
         var usedWord = words.shift();
         words.push(usedWord);
         x = 1;
-        target.setAttribute('style', 'color:' + colors[0])
+        target.setAttribute('style', 'color:' + colors[0] + '; background-color: #000000');
         letterCount += x;
         waiting = false;
       }, 1000)
