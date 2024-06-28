@@ -9,7 +9,6 @@
   <link rel="icon" type="image/png" href="favicon-32x32.png" />
   
   <style>
-
     body {
       font-family: Arial, Helvetica, sans-serif;
       font-size: 16px;
@@ -20,8 +19,8 @@
       background-color: #17202A;
       display: flex;
       flex-direction: column;
-      align-items: center; /* Centraliza horizontalmente */
-      justify-content: center; /* Centraliza verticalmente */
+      align-items: center;
+      justify-content: center;
       min-height: 100vh;
     }
 
@@ -85,11 +84,7 @@
       height: auto; 
       max-width: 100vh;
       display: block;
-      position: absolute;
       color: white;
-      top: 50%; 
-      left: 50%;
-      transform: translate(-50%, -50%);
     }
 
     .console-underscore {
@@ -100,17 +95,18 @@
     }
 
     #gameContainer {
-      width: 600px;
+      width: 80%;
+      max-width: 800px;
       height: 400px;
       overflow: hidden;
-      border: 2px solid #FFFFFF; /* Borda branca ao redor do jogo */
-      margin-bottom: 20px; /* Espaço inferior para o footer */
-      position: relative; /* Adicionado para posicionamento absoluto */
+      border: 2px solid #FFFFFF;
+      margin-bottom: 20px;
+      position: relative;
     }
 
     canvas {
       display: block;
-      background-color: #000000; /* Fundo preto para o jogo */
+      background-color: #000000;
       width: 100%;
       height: 100%;
     }
@@ -121,7 +117,7 @@
       color: #FFFFFF;
       text-align: center;
       margin-bottom: 10px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Sombra no texto */
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     }
 
     #enjoy {
@@ -130,7 +126,7 @@
       color: #FFFFFF;
       text-align: center;
       margin-bottom: 15px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Sombra no texto */
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     }
 
     .message {
@@ -139,12 +135,12 @@
       color: #FFFFFF;
       text-align: center;
       margin-top: 20px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Sombra no texto */
-      position: absolute; /* Posicionamento absoluto */
-      top: 50%; /* Centraliza verticalmente */
-      left: 50%; /* Centraliza horizontalmente */
-      transform: translate(-50%, -50%); /* Centraliza completamente */
-      display: none; /* Inicialmente oculto */
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
     }
   </style>
 </head>
@@ -166,6 +162,7 @@
   <div id="gameContainer">
     <canvas id="gameCanvas" width="600" height="400"></canvas>
     <div id="winMessage" class="message">You Win!</div>
+    <div id="gameOverMessage" class="message">Game Over!</div>
   </div>
 
   <div id="enjoy">
@@ -177,27 +174,23 @@
   </div>
 
   <script>
-
-    // Configurações do jogo
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Definir nave do jogador
     const player = {
-        x: canvas.width / 2,
-        y: canvas.height - 50,
-        width: 50,
-        height: 30,
-        color: '#00FF00',
-        speed: 5,
-        canShoot: true,
-        bullets: []
+      x: canvas.width / 2,
+      y: canvas.height - 50,
+      width: 50,
+      height: 30,
+      color: '#00FF00',
+      speed: 5,
+      canShoot: true,
+      bullets: []
     };
 
-    // Variável para a vida do jogador
     let playerLife = 100;
+    let gameOver = false;
 
-    // Array de invasores
     let invaders = [];
     const invaderWidth = 30;
     const invaderHeight = 30;
@@ -205,169 +198,163 @@
     const rows = 3;
     const cols = 10;
 
-    // Imagens das naves
     const playerShip = new Image();
     playerShip.src = 'player.png';
 
     const invaderShip = new Image();
     invaderShip.src = 'invader.png';
 
-    // Inicialização dos invasores
     for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            invaders.push({
-                x: j * (invaderWidth + 10),
-                y: i * (invaderHeight + 10),
-                width: invaderWidth,
-                height: invaderHeight,
-                ship: invaderShip, // Imagem da nave invasora
-                speed: invaderSpeed,
-                bullets: [] // Adicionar array de tiros dos invasores
-            });
-        }
+      for (let j = 0; j < cols; j++) {
+        invaders.push({
+          x: j * (invaderWidth + 10),
+          y: i * (invaderHeight + 10),
+          width: invaderWidth,
+          height: invaderHeight,
+          ship: invaderShip,
+          speed: invaderSpeed,
+          bullets: []
+        });
+      }
     }
 
-    // Função principal de desenho
     function draw() {
-        // Limpar o canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Desenhar o jogador
-        ctx.drawImage(playerShip, player.x, player.y, player.width, player.height);
+      if (gameOver) return;
 
-        // Desenhar os invasores
-        invaders.forEach(invader => {
-            ctx.drawImage(invader.ship, invader.x, invader.y, invader.width, invader.height);
+      ctx.drawImage(playerShip, player.x, player.y, player.width, player.height);
 
-            // Desenhar os tiros dos invasores
-            invader.bullets.forEach(bullet => {
-                ctx.fillStyle = '#FFFF00';
-                ctx.fillRect(bullet.x, bullet.y, 5, 10);
-            });
+      invaders.forEach(invader => {
+        ctx.drawImage(invader.ship, invader.x, invader.y, invader.width, invader.height);
+        invader.bullets.forEach(bullet => {
+          ctx.fillStyle = '#FFFF00';
+          ctx.fillRect(bullet.x, bullet.y, 5, 10);
         });
+      });
 
-        // Desenhar os tiros do jogador
-        player.bullets.forEach(bullet => {
-            ctx.fillStyle = '#FFFF00';
-            ctx.fillRect(bullet.x, bullet.y, 5, 10);
-        });
+      player.bullets.forEach(bullet => {
+        ctx.fillStyle = '#FFFF00';
+        ctx.fillRect(bullet.x, bullet.y, 5, 10);
+      });
 
-        // Desenhar vida do jogador
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = '24px Arial';
-        ctx.fillText('Life: ' + playerLife, 20, 30);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '24px Arial';
+      ctx.fillText('Life: ' + playerLife, 20, 30);
     }
 
-    // Função de atualização do jogo
     function update() {
-        // Movimentação dos invasores (exemplo simples)
-        invaders.forEach(invader => {
-            invader.x += invader.speed;
+      if (gameOver) return;
 
-            if (invader.x + invader.width > canvas.width || invader.x < 0) {
-                invader.speed *= -1;
-                invader.y += invader.height;
-            }
-        });
+      invaders.forEach(invader => {
+        invader.x += invader.speed;
 
-        // Atualizar tiros dos invasores
-        invaders.forEach(invader => {
-            invader.bullets.forEach(bullet => {
-                bullet.y += 5; // Velocidade do tiro dos invasores
-
-                // Verificar colisão com o jogador
-                if (
-                    bullet.x >= player.x &&
-                    bullet.x <= player.x + player.width &&
-                    bullet.y >= player.y &&
-                    bullet.y <= player.y + player.height
-                ) {
-                    // Reduzir vida do jogador
-                    playerLife -= 1;
-                    player.bullets.splice(player.bullets.indexOf(bullet), 1);
-                }
-
-                // Remover tiros fora do canvas
-                if (bullet.y > canvas.height) {
-                    invader.bullets.splice(invader.bullets.indexOf(bullet), 1);
-                }
-            });
-        });
-
-        // Atualizar tiros do jogador
-        player.bullets.forEach(bullet => {
-            bullet.y -= 5; // Velocidade do tiro do jogador
-
-            // Verificar colisão com os invasores
-            invaders.forEach((invader, invaderIndex) => {
-                if (
-                    bullet.x >= invader.x &&
-                    bullet.x <= invader.x + invader.width &&
-                    bullet.y >= invader.y &&
-                    bullet.y <= invader.y + invader.height
-                ) {
-                    // Remover invasor e tiro
-                    invaders.splice(invaderIndex, 1);
-                    player.bullets.splice(player.bullets.indexOf(bullet), 1);
-                }
-            });
-
-            // Remover tiros fora do canvas
-            if (bullet.y < 0) {
-                player.bullets.splice(player.bullets.indexOf(bullet), 1);
-            }
-        });
-
-        // Verificar condição de vitória
-        if (invaders.length === 0) {
-            document.getElementById('winMessage').style.display = 'block';
+        if (invader.x + invader.width > canvas.width || invader.x < 0) {
+          invader.speed *= -1;
+          invader.y += invader.height;
         }
+
+        if (invader.y + invader.height >= player.y) {
+          document.getElementById('gameOverMessage').style.display = 'block';
+          gameOver = true;
+          return;
+        }
+      });
+
+      invaders.forEach(invader => {
+        invader.bullets.forEach(bullet => {
+          bullet.y += 5;
+
+          if (
+            bullet.x >= player.x &&
+            bullet.x <= player.x + player.width &&
+            bullet.y >= player.y &&
+            bullet.y <= player.y + player.height
+          ) {
+            playerLife -= 2;
+            invader.bullets.splice(invader.bullets.indexOf(bullet), 1);
+          }
+
+          if (bullet.y > canvas.height) {
+            invader.bullets.splice(invader.bullets.indexOf(bullet), 1);
+          }
+        });
+      });
+
+      player.bullets.forEach(bullet => {
+        bullet.y -= 5;
+
+        invaders.forEach((invader, invaderIndex) => {
+          if (
+            bullet.x >= invader.x &&
+            bullet.x <= invader.x + invader.width &&
+            bullet.y >= invader.y &&
+            bullet.y <= invader.y + invader.height
+          ) {
+            invaders.splice(invaderIndex, 1);
+            player.bullets.splice(player.bullets.indexOf(bullet), 1);
+          }
+        });
+
+        if (bullet.y < 0) {
+          player.bullets.splice(player.bullets.indexOf(bullet), 1);
+        }
+      });
+
+      if (invaders.length === 0) {
+        document.getElementById('winMessage').style.display = 'block';
+        gameOver = true;
+        return;
+      }
+
+      if (playerLife <= 0) {
+        document.getElementById('gameOverMessage').style.display = 'block';
+        gameOver = true;
+        return;
+      }
     }
 
-    // Função para disparo dos invasores
     function invadersShoot() {
-        // Selecionar aleatoriamente um invasor que ainda esteja ativo
-        let activeInvaders = invaders.filter(invader => invader.bullets.length === 0);
-        if (activeInvaders.length === 0) return; // Se não houver invasores ativos, sair da função
+      if (gameOver) return;
 
-        const randomInvader = activeInvaders[Math.floor(Math.random() * activeInvaders.length)];
-        randomInvader.bullets.push({
-            x: randomInvader.x + randomInvader.width / 2 - 2.5,
-            y: randomInvader.y + randomInvader.height
-        });
+      let activeInvaders = invaders.filter(invader => invader.bullets.length === 0);
+      if (activeInvaders.length === 0) return;
+
+      const randomInvader = activeInvaders[Math.floor(Math.random() * activeInvaders.length)];
+      randomInvader.bullets.push({
+        x: randomInvader.x + randomInvader.width / 2 - 2.5,
+        y: randomInvader.y + randomInvader.height
+      });
     }
 
-    // Loop principal do jogo
     function gameLoop() {
-        update();
-        draw();
+      update();
+      draw();
+      if (!gameOver) {
         requestAnimationFrame(gameLoop);
+      }
     }
 
-    // Controles do jogador
     document.addEventListener('keydown', function(event) {
-        if (event.key === 'ArrowLeft' && player.x > 0) {
-            player.x -= player.speed;
-        } else if (event.key === 'ArrowRight' && player.x + player.width < canvas.width) {
-            player.x += player.speed;
-        } else if (event.key === ' ' && player.canShoot) { // Barra de espaço para disparar
-            player.canShoot = false;
-            player.bullets.push({
-                x: player.x + player.width / 2 - 2.5,
-                y: player.y - 10
-            });
-            setTimeout(() => {
-                player.canShoot = true;
-            }, 300); // Tempo de espera entre disparos
-        }
+      if (event.key === 'ArrowLeft' && player.x > 0) {
+        player.x -= player.speed;
+      } else if (event.key === 'ArrowRight' && player.x + player.width < canvas.width) {
+        player.x += player.speed;
+      } else if (event.key === ' ' && player.canShoot) {
+        player.canShoot = false;
+        player.bullets.push({
+          x: player.x + player.width / 2 - 2.5,
+          y: player.y - 10
+        });
+        setTimeout(() => {
+          player.canShoot = true;
+        }, 300);
+      }
     });
 
-    // Iniciar o jogo
     gameLoop();
-
-    // Chamada inicial e repetição a cada x segundos
-    invadersShoot(); // Dispara inicialmente
-    setInterval(invadersShoot, 300); // Repete a cada x segundos
+    invadersShoot();
+    setInterval(invadersShoot, 300);
   </script>
   
   <audio autoplay="autoplay" controls="controls">
