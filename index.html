@@ -20,6 +20,8 @@
       background-color: #17202A;
       display: flex;
       flex-direction: column;
+      align-items: center; /* Centraliza horizontalmente */
+      justify-content: center; /* Centraliza verticalmente */
       min-height: 100vh;
     }
 
@@ -61,7 +63,7 @@
       border-bottom:3px solid #2874A6;
     }
 
-  #footer {
+    #footer {
       padding: 0;
       background-color: #2874A6;
       color: #e3e1e1;
@@ -73,33 +75,82 @@
       width: 100%;
     }
 
-.console-container {
-    padding: 20px; 
-    font-family: "Press Start 2P", system-ui;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 5vh;
-    text-align: center;
-    height: auto; 
-    max-width: 100vh;
-    display: block;
-    position: absolute;
-    color: white;
-    top: 50%; 
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
+    .console-container {
+      padding: 20px; 
+      font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 5vh;
+      text-align: center;
+      height: auto; 
+      max-width: 100vh;
+      display: block;
+      position: absolute;
+      color: white;
+      top: 50%; 
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
 
-  .console-underscore {
-    display:inline-block;
-    position:relative;
-    top:-0.14em;
-    left:10px;
-}
+    .console-underscore {
+      display:inline-block;
+      position:relative;
+      top:-0.14em;
+      left:10px;
+    }
+
+    #gameContainer {
+      width: 600px;
+      height: 400px;
+      overflow: hidden;
+      border: 2px solid #FFFFFF; /* Borda branca ao redor do jogo */
+      margin-bottom: 20px; /* Espaço inferior para o footer */
+      position: relative; /* Adicionado para posicionamento absoluto */
+    }
+
+    canvas {
+      display: block;
+      background-color: #000000; /* Fundo preto para o jogo */
+      width: 100%;
+      height: 100%;
+    }
+
+    #playerName {
+      font-family: "Press Start 2P", system-ui;
+      font-size: 48px;
+      color: #FFFFFF;
+      text-align: center;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Sombra no texto */
+    }
+
+    #enjoy {
+      font-family: "Press Start 2P", system-ui;
+      font-size: 16px;
+      color: #FFFFFF;
+      text-align: center;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Sombra no texto */
+    }
+
+    .message {
+      font-family: "Press Start 2P", system-ui;
+      font-size: 36px;
+      color: #FFFFFF;
+      text-align: center;
+      margin-top: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Sombra no texto */
+      position: absolute; /* Posicionamento absoluto */
+      top: 50%; /* Centraliza verticalmente */
+      left: 50%; /* Centraliza horizontalmente */
+      transform: translate(-50%, -50%); /* Centraliza completamente */
+      display: none; /* Inicialmente oculto */
+    }
   </style>
 </head>
 
 <body>
+
   <nav id="menu"> 
     <ul> 
       <li><a href="index.html">Home</a></li>
@@ -107,63 +158,223 @@
       <li><a href="social.html">Social</a></li>
     </ul> 
   </nav>
-  <div class='console-container'><span id='text'></span><div class='console-underscore' id='console'>&#95;</div></div>
+
+  <div id="playerName">
+    Eduardo Araujo Dev
+  </div>
+
+  <div id="gameContainer">
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+    <div id="winMessage" class="message">You Win!</div>
+  </div>
+
+  <div id="enjoy">
+    Enjoy the mini game!
+  </div>
 
   <div id="footer">
     <p>Developed by Eduardo Araujo &#169; 2024</p>
   </div>
+
   <script>
-consoleText(['Data is the new oil', 'Eduardo Araujo', 'Data Science', 'Python', 'R Language', 'Pandas', 'Tidyverse'], 'text',['#ffffff']);
 
-function consoleText(words, id, colors) {
-  if (colors === undefined) colors = ['#fff'];
-  var visible = true;
-  var con = document.getElementById('console');
-  var letterCount = 1;
-  var x = 1;
-  var waiting = false;
-  var target = document.getElementById(id)
-  target.setAttribute('style', 'color:' + colors[0])
-  window.setInterval(function() {
+    // Configurações do jogo
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-    if (letterCount === 0 && waiting === false) {
-      waiting = true;
-      target.innerHTML = words[0].substring(0, letterCount)
-      window.setTimeout(function() {
-        var usedColor = colors.shift();
-        colors.push(usedColor);
-        var usedWord = words.shift();
-        words.push(usedWord);
-        x = 1;
-        target.setAttribute('style', 'color:' + colors[0] + '; background-color: #17202A');
-        letterCount += x;
-        waiting = false;
-      }, 1000)
-    } else if (letterCount === words[0].length + 1 && waiting === false) {
-      waiting = true;
-      window.setTimeout(function() {
-        x = -1;
-        letterCount += x;
-        waiting = false;
-      }, 1000)
-    } else if (waiting === false) {
-      target.innerHTML = words[0].substring(0, letterCount)
-      letterCount += x;
+    // Definir nave do jogador
+    const player = {
+        x: canvas.width / 2,
+        y: canvas.height - 50,
+        width: 50,
+        height: 30,
+        color: '#00FF00',
+        speed: 5,
+        canShoot: true,
+        bullets: []
+    };
+
+    // Variável para a vida do jogador
+    let playerLife = 100;
+
+    // Array de invasores
+    let invaders = [];
+    const invaderWidth = 30;
+    const invaderHeight = 30;
+    const invaderSpeed = 2;
+    const rows = 3;
+    const cols = 10;
+
+    // Imagens das naves
+    const playerShip = new Image();
+    playerShip.src = 'player.png';
+
+    const invaderShip = new Image();
+    invaderShip.src = 'invader.png';
+
+    // Inicialização dos invasores
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            invaders.push({
+                x: j * (invaderWidth + 10),
+                y: i * (invaderHeight + 10),
+                width: invaderWidth,
+                height: invaderHeight,
+                ship: invaderShip, // Imagem da nave invasora
+                speed: invaderSpeed,
+                bullets: [] // Adicionar array de tiros dos invasores
+            });
+        }
     }
-  }, 120)
-  window.setInterval(function() {
-    if (visible === true) {
-      con.className = 'console-underscore hidden'
-      visible = false;
 
-    } else {
-      con.className = 'console-underscore'
+    // Função principal de desenho
+    function draw() {
+        // Limpar o canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      visible = true;
+        // Desenhar o jogador
+        ctx.drawImage(playerShip, player.x, player.y, player.width, player.height);
+
+        // Desenhar os invasores
+        invaders.forEach(invader => {
+            ctx.drawImage(invader.ship, invader.x, invader.y, invader.width, invader.height);
+
+            // Desenhar os tiros dos invasores
+            invader.bullets.forEach(bullet => {
+                ctx.fillStyle = '#FFFF00';
+                ctx.fillRect(bullet.x, bullet.y, 5, 10);
+            });
+        });
+
+        // Desenhar os tiros do jogador
+        player.bullets.forEach(bullet => {
+            ctx.fillStyle = '#FFFF00';
+            ctx.fillRect(bullet.x, bullet.y, 5, 10);
+        });
+
+        // Desenhar vida do jogador
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '24px Arial';
+        ctx.fillText('Life: ' + playerLife, 20, 30);
     }
-  }, 400)
-}
+
+    // Função de atualização do jogo
+    function update() {
+        // Movimentação dos invasores (exemplo simples)
+        invaders.forEach(invader => {
+            invader.x += invader.speed;
+
+            if (invader.x + invader.width > canvas.width || invader.x < 0) {
+                invader.speed *= -1;
+                invader.y += invader.height;
+            }
+        });
+
+        // Atualizar tiros dos invasores
+        invaders.forEach(invader => {
+            invader.bullets.forEach(bullet => {
+                bullet.y += 5; // Velocidade do tiro dos invasores
+
+                // Verificar colisão com o jogador
+                if (
+                    bullet.x >= player.x &&
+                    bullet.x <= player.x + player.width &&
+                    bullet.y >= player.y &&
+                    bullet.y <= player.y + player.height
+                ) {
+                    // Reduzir vida do jogador
+                    playerLife -= 1;
+                    player.bullets.splice(player.bullets.indexOf(bullet), 1);
+                }
+
+                // Remover tiros fora do canvas
+                if (bullet.y > canvas.height) {
+                    invader.bullets.splice(invader.bullets.indexOf(bullet), 1);
+                }
+            });
+        });
+
+        // Atualizar tiros do jogador
+        player.bullets.forEach(bullet => {
+            bullet.y -= 5; // Velocidade do tiro do jogador
+
+            // Verificar colisão com os invasores
+            invaders.forEach((invader, invaderIndex) => {
+                if (
+                    bullet.x >= invader.x &&
+                    bullet.x <= invader.x + invader.width &&
+                    bullet.y >= invader.y &&
+                    bullet.y <= invader.y + invader.height
+                ) {
+                    // Remover invasor e tiro
+                    invaders.splice(invaderIndex, 1);
+                    player.bullets.splice(player.bullets.indexOf(bullet), 1);
+                }
+            });
+
+            // Remover tiros fora do canvas
+            if (bullet.y < 0) {
+                player.bullets.splice(player.bullets.indexOf(bullet), 1);
+            }
+        });
+
+        // Verificar condição de vitória
+        if (invaders.length === 0) {
+            document.getElementById('winMessage').style.display = 'block';
+        }
+    }
+
+    // Função para disparo dos invasores
+    function invadersShoot() {
+        // Selecionar aleatoriamente um invasor que ainda esteja ativo
+        let activeInvaders = invaders.filter(invader => invader.bullets.length === 0);
+        if (activeInvaders.length === 0) return; // Se não houver invasores ativos, sair da função
+
+        const randomInvader = activeInvaders[Math.floor(Math.random() * activeInvaders.length)];
+        randomInvader.bullets.push({
+            x: randomInvader.x + randomInvader.width / 2 - 2.5,
+            y: randomInvader.y + randomInvader.height
+        });
+    }
+
+    // Loop principal do jogo
+    function gameLoop() {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    // Controles do jogador
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'ArrowLeft' && player.x > 0) {
+            player.x -= player.speed;
+        } else if (event.key === 'ArrowRight' && player.x + player.width < canvas.width) {
+            player.x += player.speed;
+        } else if (event.key === ' ' && player.canShoot) { // Barra de espaço para disparar
+            player.canShoot = false;
+            player.bullets.push({
+                x: player.x + player.width / 2 - 2.5,
+                y: player.y - 10
+            });
+            setTimeout(() => {
+                player.canShoot = true;
+            }, 300); // Tempo de espera entre disparos
+        }
+    });
+
+    // Iniciar o jogo
+    gameLoop();
+
+    // Chamada inicial e repetição a cada x segundos
+    invadersShoot(); // Dispara inicialmente
+    setInterval(invadersShoot, 300); // Repete a cada x segundos
   </script>
-</body>
-</html>
+  
+  <audio autoplay="autoplay" controls="controls">
+    <source src="spaceinvaders.mp3" type="audio/mp3" />
+    Seu navegador não suporta HTML5
+  </audio>
 
+</body>
+
+</html>
