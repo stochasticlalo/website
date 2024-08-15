@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eduardo Araujo</title>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .neon-text {
+            font-size: 60px;
+            color: #00ffcc;
+            text-shadow: 
+                0 0 10px #00ffcc, 
+                0 0 20px #00ffcc, 
+                0 0 30px #00ffcc, 
+                0 0 40px #00ffcc, 
+                0 0 70px #00ffcc, 
+                0 0 80px #00ffcc, 
+                0 0 100px #00ffcc, 
+                0 0 150px #00ffcc;
+            margin-bottom: 50px;
+            animation: flicker 1.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .cards-container {
+            display: flex;
+            gap: 20px; /* Espaço entre as cartas */
+            perspective: 1000px;
+        }
+
+        .card {
+            width: 200px;
+            height: 300px;
+            border: 1px solid white;
+            border-radius: 10px;
+            background: white;
+            color: black;
+            text-align: center;
+            font-size: 4em;
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+        }
+
+        .card.red {
+            color: red;
+        }
+
+        .card-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .card-value {
+            font-size: 2em;
+        }
+
+        .card-suit {
+            font-size: 1.5em;
+        }
+
+        .card.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="neon-text">Embrace randomness...</div>
+    <div class="cards-container" id="cards-container">
+        <div class="card" id="card1">
+            <div class="card-content">
+                <div class="card-value" id="card-value1"></div>
+                <div class="card-suit" id="card-suit1"></div>
+            </div>
+        </div>
+        <div class="card" id="card2">
+            <div class="card-content">
+                <div class="card-value" id="card-value2"></div>
+                <div class="card-suit" id="card-suit2"></div>
+            </div>
+        </div>
+        <div class="card" id="card3">
+            <div class="card-content">
+                <div class="card-value" id="card-value3"></div>
+                <div class="card-suit" id="card-suit3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2024 Eduardo Araujo. Todos os direitos reservados.
+    </div>
+
+    <script>
+        // Cria o baralho de cartas
+        function createDeck() {
+            const suits = ['♠', '♥', '♦', '♣'];
+            const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+            let deck = [];
+
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit: suit, value: value });
+                }
+            }
+            return deck;
+        }
+
+        // Embaralha o baralho
+        function shuffleDeck(deck) {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck;
+        }
+
+        let deck = shuffleDeck(createDeck()); // Baralho embaralhado
+
+        function drawCard() {
+            if (deck.length === 0) {
+                deck = shuffleDeck(createDeck()); // Se o baralho estiver vazio, cria e embaralha um novo baralho
+            }
+            return deck.pop(); // Retira uma carta do baralho
+        }
+
+        function updateCard(cardId) {
+            const card = drawCard();
+            if (card) {
+                const cardValue = document.getElementById(`card-value${cardId}`);
+                const cardSuit = document.getElementById(`card-suit${cardId}`);
+                const cardElement = document.getElementById(`card${cardId}`);
+
+                cardValue.textContent = card.value;
+                cardSuit.textContent = card.suit;
+
+                if (card.suit === '♥' || card.suit === '♦') {
+                    cardElement.classList.add('red');
+                } else {
+                    cardElement.classList.remove('red');
+                }
+            }
+        }
+
+        function startAnimation() {
+            let cardIndex = 1;
+            const interval = 1000; // Tempo para exibir cada carta inicialmente
+            const numCards = 3; // Número de cartas
+            const totalDuration = 30000; // Tempo total de animação
+
+            function showNextCard() {
+                if (cardIndex <= numCards) {
+                    const cardId = `card${cardIndex}`;
+                    document.getElementById(cardId).classList.add('show');
+                    updateCard(cardIndex);
+                    cardIndex++;
+                    setTimeout(showNextCard, interval); // Exibe a próxima carta
+                } else {
+                    // Inicia a atualização contínua das cartas
+                    cardIndex = 1;
+                    const updateInterval = 1000; // Tempo para atualizar cada carta após a exibição inicial
+                    const intervalId = setInterval(() => {
+                        updateCard(cardIndex);
+                        cardIndex = (cardIndex % numCards) + 1; // Move para a próxima carta
+                    }, updateInterval);
+
+                    // Redireciona para 'main.html' após 30 segundos e para a parada dos intervalos
+                    setTimeout(() => {
+                        clearInterval(intervalId);
+                        window.location.href = 'home.html';
+                    }, totalDuration); // 30 segundos
+                }
+            }
+
+            showNextCard();
+        }
+
+        document.addEventListener('DOMContentLoaded', startAnimation);
+    </script>
+</body>
+</html>
