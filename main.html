@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eduardo Araujo</title>
+    <style>
+        :root {
+            --bg-color-light: #f0f0f0;
+            --text-color-light: #333;
+            --bg-color-dark: #333;
+            --text-color-dark: #f0f0f0;
+            --link-bar-bg-light: #007BFF;
+            --link-bar-bg-dark: #FF5722; /* Laranja para o tema escuro */
+            --link-color-light: white;
+            --link-color-dark: white;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            justify-content: center; /* Centraliza verticalmente o conteúdo */
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: var(--link-bar-bg-light);
+            color: var(--link-color-light);
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--link-bar-bg-dark);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start; /* Alinha itens no topo do container */
+            flex-wrap: wrap;
+            margin-top: 50px;
+            max-width: 1200px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            transition: background-color 0.3s;
+            text-align: justify;
+            height: auto; /* Ajusta a altura automaticamente conforme o conteúdo */
+        }
+
+        .column {
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .image-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .image-container img {
+            max-width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 150px;
+        }
+
+        .link-bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .link-bar-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--text-color-light);
+            text-align: center;
+        }
+
+        .link-bar {
+            display: flex;
+            gap: 15px;
+            background-color: var(--link-bar-bg-light);
+            padding: 15px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .link-bar a {
+            color: var(--link-color-light);
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .link-bar a:hover {
+            color: #FFD700;
+        }
+
+        body.dark {
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        body.dark .container {
+            background-color: #444;
+        }
+
+        body.dark .theme-toggle {
+            background-color: var(--link-bar-bg-dark);
+            color: var(--link-color-dark);
+        }
+
+        body.dark .link-bar {
+            background-color: var(--link-bar-bg-dark);
+        }
+
+        body.dark .link-bar-title {
+            color: var(--text-color-dark);
+        }
+
+       p {
+           line-height: 1.5; /* Ajuste esse valor conforme necessário */
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="theme-toggle" onclick="toggleTheme()">Tema Escuro</button>
+
+    <div class="container">
+        <div class="column">
+            <p>Olá! Sou um estudante de análise e desenvolvimento de sistemas com uma paixão profunda por estatística, probabilidades e o fascinante mundo do acaso e da aleatoriedade. Meu interesse por entender e modelar o imprevisível me levou a criar scripts para simulações estocásticas, números aleatórios, passeios aleatórios e muito mais. Atualmente, estou traçando meu caminho para uma pós-graduação em Data Science e planejando uma segunda graduação em Estatística, com o objetivo de explorar ainda mais o impacto da aleatoriedade e das probabilidades em diferentes contextos. Se você compartilha o entusiasmo pelo estudo do acaso ou está curioso sobre como números e dados podem moldar o futuro, convido você a acompanhar minha jornada e explorar os projetos que desenvolvo!</p>
+        </div>
+        <div class="image-container">
+            <img src="./lalo.jpg" alt="profile picture">
+        </div>
+        <div class="column">
+            <p>O cálculo de probabilidades tem suas raízes no século XVI com Gerolamo Cardano, que fez contribuições iniciais sobre jogos de azar e probabilidades. No século XVIII, Abraham de Moivre desenvolveu a teoria das probabilidades e publicou a obra seminal "The Doctrine of Chances". Avançando para o século XX, Andrey Kolmogorov formulou a base matemática moderna da probabilidade com seu axioma fundamental. Nikolai Markov e Sergey Smirnov ampliaram essas ideias com seus trabalhos sobre processos estocásticos e distribuições, respectivamente. A interseção entre probabilidade e estatística ganhou destaque com Sir Ronald A. Fisher, cuja abordagem revolucionária à inferência estatística moldou a análise de dados. Finalmente, John Tukey introduziu a análise exploratória de dados, transformando a forma como interpretamos e visualizamos informações, solidificando o campo da estatística como o conhecemos hoje.</p>
+        </div>
+    </div>
+
+    <div class="link-bar-wrapper">
+        <div class="link-bar-title">Meus links</div>
+        <div class="link-bar">
+            <a href="https://www.linkedin.com/in/stochasticlalo/">LinkedIn</a>
+            <a href="https://www.instagram.com/stochasticlalo/">Instagram</a>
+            <a href="https://github.com/stochasticlalo">Github</a>
+            <a href="https://www.youtube.com/@stochasticlalo">YouTube</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2024 Eduardo Araujo. Todos os direitos reservados.
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.querySelector('.theme-toggle');
+
+            body.classList.toggle('dark');
+            
+            if (body.classList.contains('dark')) {
+                button.textContent = 'Tema Claro';
+            } else {
+                button.textContent = 'Tema Escuro';
+            }
+        }
+    </script>
+
+</body>
+</html>
